@@ -16,6 +16,7 @@ builder.Services.AddAuthentication()                       // registers the auth
     {
         // a) Where to validate tokens (your IdentityServer URL)
         options.Authority = "https://localhost:5001";
+        //options.Authority = "http://localhost:3000/ids";
 
         // b) We’re opting out of checking the “aud” claim here
         //    (because by default the JWT’s audience is the client ID, not “api1”)

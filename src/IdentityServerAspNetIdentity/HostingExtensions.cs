@@ -38,7 +38,7 @@ internal static class HostingExtensions
 
         // Configure ASP.NET Identity to use ApplicationUser and IdentityRole
         // Stores user and role data in the EF Core ApplicationDbContext
-        builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+        builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 

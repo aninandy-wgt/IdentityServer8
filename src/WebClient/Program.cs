@@ -14,6 +14,10 @@ builder.Services.AddAuthentication(options =>
     {
         options.Authority = "https://localhost:5001";
 
+        //AdminUI
+        //options.Authority = "http://localhost:3000/ids";
+        //options.RequireHttpsMetadata = false;
+
         //QS2:matches IdentityServer config
         options.ClientId = "web";    
         options.ClientSecret = "secret";

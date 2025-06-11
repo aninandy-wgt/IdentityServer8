@@ -29,8 +29,10 @@ public static class Config
 
             // Custom "color" resource to carry a favorite_color claim
             new IdentityResource(
-                name: "color",
-                userClaims: new [] { "favorite_color" })
+    name: "color",
+    displayName: "Your favorite color",
+    userClaims: new[] { "favorite_color" }
+)
         };
 
     // API scopes represent the APIs this IdentityServer protects.

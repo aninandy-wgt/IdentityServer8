@@ -42,6 +42,7 @@ public class SeedData
                             new Claim(JwtClaimTypes.GivenName, "Alice"),
                             new Claim(JwtClaimTypes.FamilyName, "Smith"),
                             new Claim(JwtClaimTypes.WebSite, "http://alice.example.com"),
+                            new Claim("location", "WGT CA office")
                         }).Result;
                 if (!result.Succeeded)
                 {
@@ -75,7 +76,7 @@ public class SeedData
                             new Claim(JwtClaimTypes.GivenName, "Bob"),
                             new Claim(JwtClaimTypes.FamilyName, "Smith"),
                             new Claim(JwtClaimTypes.WebSite, "http://bob.example.com"),
-                            new Claim("location", "somewhere")
+                            new Claim("location", "WGT CA office")
                         }).Result;
                 if (!result.Succeeded)
                 {
@@ -86,6 +87,33 @@ public class SeedData
             else
             {
                 Log.Debug("bob already exists");
+            }
+
+            // Generalize: Add missing GivenName and FamilyName claims for all users
+            var allUsers = userMgr.Users.ToList();
+            foreach (var user in allUsers)
+            {
+                var claims = userMgr.GetClaimsAsync(user).Result;
+                var claimsToAdd = new List<Claim>();
+
+                if (!claims.Any(c => c.Type == JwtClaimTypes.GivenName) && !string.IsNullOrEmpty(user.GivenName))
+                {
+                    claimsToAdd.Add(new Claim(JwtClaimTypes.GivenName, user.GivenName));
+                }
+                if (!claims.Any(c => c.Type == JwtClaimTypes.FamilyName) && !string.IsNullOrEmpty(user.FamilyName))
+                {
+                    claimsToAdd.Add(new Claim(JwtClaimTypes.FamilyName, user.FamilyName));
+                }
+
+                if (claimsToAdd.Count > 0)
+                {
+                    var result = userMgr.AddClaimsAsync(user, claimsToAdd).Result;
+                    if (!result.Succeeded)
+                    {
+                        throw new Exception(result.Errors.First().Description);
+                    }
+                    Log.Debug($"Added missing claims for user {user.UserName}");
+                }
             }
         }
     }
