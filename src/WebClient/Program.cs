@@ -19,7 +19,7 @@ builder.Services.AddAuthentication(options =>
         //options.RequireHttpsMetadata = false;
 
         //QS2:matches IdentityServer config
-        options.ClientId = "web";    
+        options.ClientId = "web";
         options.ClientSecret = "secret";
 
         options.ResponseType = "code";

@@ -1,119 +1,210 @@
-using System.Security.Claims;
 using Duende.IdentityModel;
 using IdentityServerAspNetIdentity.Data;
 using IdentityServerAspNetIdentity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Security.Claims;
 
-namespace IdentityServerAspNetIdentity;
-
-public class SeedData
+namespace IdentityServerAspNetIdentity
 {
-    public static void EnsureSeedData(WebApplication app)
+    public static class SeedData
     {
-        using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+        public static async Task EnsureSeedData(WebApplication app)
         {
-            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            //for PSQL12 manually drop DB each time property added, might not be needed for 17
-            //var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
-            context.Database.EnsureDeleted();
-            context.Database.Migrate();
+            using var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            var sp = scope.ServiceProvider;
+            var db = sp.GetRequiredService<ApplicationDbContext>();
+            var userMgr = sp.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleMgr = sp.GetRequiredService<RoleManager<ApplicationRole>>();
 
-            var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var alice = userMgr.FindByNameAsync("alice").Result;
-            if (alice == null)
+            // 1) Migrate database
+            db.Database.EnsureDeleted();
+            db.Database.Migrate();
+
+            // 2) Seed roles
+            string[] roles = { AppRoles.Admin, AppRoles.ProjectManager, AppRoles.Viewer };
+            foreach (var r in roles)
             {
-                alice = new ApplicationUser
+                var exists = roleMgr.RoleExistsAsync(r).Result;
+                if (!exists)
                 {
-                    UserName = "alice",
-                    Email = "AliceSmith@example.com",
-                    EmailConfirmed = true,
-                    FavoriteColor = "red",
+                    var roleResult = roleMgr.CreateAsync(new ApplicationRole { Name = r }).Result;
+                    if (!roleResult.Succeeded)
+                        throw new Exception(roleResult.Errors.First().Description);
+                }
+            }
+
+            // 2a) Add claims to roles
+            var adminRole = await roleMgr.FindByNameAsync(AppRoles.Admin);
+            if (adminRole != null)
+            {
+                var existingClaims = await roleMgr.GetClaimsAsync(adminRole);
+                var permissions = new[]
+                {
+                    AppPermissions.ListRoles,
+                    AppPermissions.CreateRole,
+                    AppPermissions.AssignRole
                 };
-                var result = userMgr.CreateAsync(alice, "Pass123$").Result;
-                if (!result.Succeeded)
+                foreach (var permission in permissions)
                 {
-                    throw new Exception(result.Errors.First().Description);
-                }
-
-                result = userMgr.AddClaimsAsync(alice, new Claim[]{
-                            new Claim(JwtClaimTypes.Name, "Alice Smith"),
-                            new Claim(JwtClaimTypes.GivenName, "Alice"),
-                            new Claim(JwtClaimTypes.FamilyName, "Smith"),
-                            new Claim(JwtClaimTypes.WebSite, "http://alice.example.com"),
-                            new Claim("location", "WGT CA office")
-                        }).Result;
-                if (!result.Succeeded)
-                {
-                    throw new Exception(result.Errors.First().Description);
-                }
-                Log.Debug("alice created");
-            }
-            else
-            {
-                Log.Debug("alice already exists");
-            }
-
-            var bob = userMgr.FindByNameAsync("bob").Result;
-            if (bob == null)
-            {
-                bob = new ApplicationUser
-                {
-                    UserName = "bob",
-                    Email = "BobSmith@example.com",
-                    EmailConfirmed = true,
-                    FavoriteColor = "blue",
-                };
-                var result = userMgr.CreateAsync(bob, "Pass123$").Result;
-                if (!result.Succeeded)
-                {
-                    throw new Exception(result.Errors.First().Description);
-                }
-
-                result = userMgr.AddClaimsAsync(bob, new Claim[]{
-                            new Claim(JwtClaimTypes.Name, "Bob Smith"),
-                            new Claim(JwtClaimTypes.GivenName, "Bob"),
-                            new Claim(JwtClaimTypes.FamilyName, "Smith"),
-                            new Claim(JwtClaimTypes.WebSite, "http://bob.example.com"),
-                            new Claim("location", "WGT CA office")
-                        }).Result;
-                if (!result.Succeeded)
-                {
-                    throw new Exception(result.Errors.First().Description);
-                }
-                Log.Debug("bob created");
-            }
-            else
-            {
-                Log.Debug("bob already exists");
-            }
-
-            // Generalize: Add missing GivenName and FamilyName claims for all users
-            var allUsers = userMgr.Users.ToList();
-            foreach (var user in allUsers)
-            {
-                var claims = userMgr.GetClaimsAsync(user).Result;
-                var claimsToAdd = new List<Claim>();
-
-                if (!claims.Any(c => c.Type == JwtClaimTypes.GivenName) && !string.IsNullOrEmpty(user.GivenName))
-                {
-                    claimsToAdd.Add(new Claim(JwtClaimTypes.GivenName, user.GivenName));
-                }
-                if (!claims.Any(c => c.Type == JwtClaimTypes.FamilyName) && !string.IsNullOrEmpty(user.FamilyName))
-                {
-                    claimsToAdd.Add(new Claim(JwtClaimTypes.FamilyName, user.FamilyName));
-                }
-
-                if (claimsToAdd.Count > 0)
-                {
-                    var result = userMgr.AddClaimsAsync(user, claimsToAdd).Result;
-                    if (!result.Succeeded)
+                    if (!existingClaims.Any(c => c.Type == "permission" && c.Value == permission))
                     {
-                        throw new Exception(result.Errors.First().Description);
+                        await roleMgr.AddClaimAsync(adminRole, new Claim("permission", permission));
                     }
-                    Log.Debug($"Added missing claims for user {user.UserName}");
                 }
+            }
+
+            var pmRole = await roleMgr.FindByNameAsync(AppRoles.ProjectManager);
+            if (pmRole != null)
+            {
+                var existingClaims = await roleMgr.GetClaimsAsync(pmRole);
+                var permissions = new[]
+                {
+                    AppPermissions.ListRoles,
+                    AppPermissions.AssignRole
+                };
+                foreach (var permission in permissions)
+                {
+                    if (!existingClaims.Any(c => c.Type == "permission" && c.Value == permission))
+                    {
+                        await roleMgr.AddClaimAsync(pmRole, new Claim("permission", permission));
+                    }
+                }
+            }
+            
+            var viewerRole = await roleMgr.FindByNameAsync(AppRoles.Viewer);
+            if (viewerRole != null) {
+                var existingClaims = await roleMgr.GetClaimsAsync(viewerRole);
+                var permissions = new[]
+                {
+                    AppPermissions.ListRoles
+                };
+                foreach (var permission in permissions)
+                {
+                    if (!existingClaims.Any(c => c.Type == "permission" && c.Value == permission))
+                    {
+                        await roleMgr.AddClaimAsync(viewerRole, new Claim("permission", permission));
+                    }
+                }
+            }
+
+            // 3) Seed users and their properties/claims
+            SeedUser(userMgr,
+                userName: "alice",
+                email: "AliceSmith@example.com",
+                password: "Pass123$",
+                favoriteColor: "red",
+                givenName: "Alice",
+                familyName: "Smith",
+                (JwtClaimTypes.Name, "Alice Smith"),
+                (JwtClaimTypes.WebSite, "http://alice.example.com"),
+                ("location", "WGT CA office")
+            );
+
+            SeedUser(userMgr,
+                userName: "bob",
+                email: "BobSmith@example.com",
+                password: "Pass123$",
+                favoriteColor: "blue",
+                givenName: "Bob",
+                familyName: "Smith",
+                (JwtClaimTypes.Name, "Bob Smith"),
+                (JwtClaimTypes.WebSite, "http://bob.example.com"),
+                ("location", "WGT CA office")
+            );
+
+            SeedUser(userMgr,
+                userName: "tom",
+                email: "tomsmith@example.com",
+                password: "Pass123$",
+                favoriteColor: "green",
+                givenName: "Tom",
+                familyName: "Smith",
+                (JwtClaimTypes.Name, "Tom Smith"),
+                (JwtClaimTypes.WebSite, "http://tom.example.com"),
+                ("location", "WGT SA office")
+            );
+
+            SeedUser(userMgr,
+                userName: "john",
+                email: "johnsmith@example.com",
+                password: "Pass123$",
+                favoriteColor: "purple",
+                givenName: "John",
+                familyName: "Smith",
+                (JwtClaimTypes.Name, "John Smith"),
+                (JwtClaimTypes.WebSite, "http://john.example.com"),
+                ("location", "WGT CA office")
+            );
+
+            // 4) Assign Alice to Admin role
+            var alice = userMgr.FindByNameAsync("alice").Result;
+            if (!userMgr.IsInRoleAsync(alice, AppRoles.Admin).Result)
+            {
+                var addRoleResult = userMgr.AddToRoleAsync(alice, AppRoles.Admin).Result;
+                if (!addRoleResult.Succeeded)
+                    throw new Exception(addRoleResult.Errors.First().Description);
+            }
+
+            Log.Debug("Seeding complete: roles created and users assigned.");
+        }
+
+        private static void SeedUser(
+            UserManager<ApplicationUser> userMgr,
+            string userName,
+            string email,
+            string password,
+            string favoriteColor,
+            string givenName,
+            string familyName,
+            params (string Type, string Value)[] extraClaims)
+        {
+            var user = userMgr.FindByNameAsync(userName).Result;
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = userName,
+                    Email = email,
+                    EmailConfirmed = true,
+                    FavoriteColor = favoriteColor,
+                    GivenName = givenName,
+                    FamilyName = familyName
+                };
+                var createResult = userMgr.CreateAsync(user, password).Result;
+                if (!createResult.Succeeded)
+                    throw new Exception(createResult.Errors.First().Description);
+
+                var claimList = extraClaims.Select(c => new Claim(c.Type, c.Value)).ToArray();
+                var claimResult = userMgr.AddClaimsAsync(user, claimList).Result;
+                if (!claimResult.Succeeded)
+                    throw new Exception(claimResult.Errors.First().Description);
+
+                Log.Debug($"{userName} created");
+            }
+            else
+            {
+                // update properties if missing
+                var mustUpdate = false;
+                if (user.GivenName != givenName)
+                {
+                    user.GivenName = givenName;
+                    mustUpdate = true;
+                }
+                if (user.FamilyName != familyName)
+                {
+                    user.FamilyName = familyName;
+                    mustUpdate = true;
+                }
+                if (mustUpdate)
+                {
+                    var updateResult = userMgr.UpdateAsync(user).Result;
+                    if (!updateResult.Succeeded)
+                        throw new Exception(updateResult.Errors.First().Description);
+                }
+
+                Log.Debug($"{userName} already exists");
             }
         }
     }

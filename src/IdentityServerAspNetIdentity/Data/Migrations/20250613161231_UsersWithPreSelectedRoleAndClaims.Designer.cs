@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IdentityServerAspNetIdentity.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250611174323_CustomProfileData")]
-    partial class CustomProfileData
+    [Migration("20250613161231_UsersWithPreSelectedRoleAndClaims")]
+    partial class UsersWithPreSelectedRoleAndClaims
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

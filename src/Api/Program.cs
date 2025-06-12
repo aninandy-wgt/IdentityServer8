@@ -12,11 +12,10 @@ builder.Services.AddSwaggerGen();
 
 // 1) Configure authentication to use JWT Bearer tokens
 builder.Services.AddAuthentication()                       // registers the authentication services
-    .AddJwtBearer(options =>                              // adds the “Bearer” handler
+    .AddJwtBearer(static options =>                              // adds the “Bearer” handler
     {
         // a) Where to validate tokens (your IdentityServer URL)
         options.Authority = "https://localhost:5001";
-        //options.Authority = "http://localhost:3000/ids";
 
         // b) We’re opting out of checking the “aud” claim here
         //    (because by default the JWT’s audience is the client ID, not “api1”)
@@ -24,14 +23,11 @@ builder.Services.AddAuthentication()                       // registers the auth
     });
 
 // 2) Define an authorization policy requiring the “api1” scope/claim
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("ApiScope", policy =>
+builder.Services.AddAuthorizationBuilder().AddPolicy("ApiScope", static policy =>
     {
-        policy.RequireAuthenticatedUser();
-        policy.RequireClaim("scope", "api1");
+        _ = policy.RequireAuthenticatedUser();
+        _ = policy.RequireClaim("scope", "api1");
     });
-});
 
 var app = builder.Build();
 

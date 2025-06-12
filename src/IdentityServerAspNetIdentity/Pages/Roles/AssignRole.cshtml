@@ -1,0 +1,72 @@
+﻿@page
+@using IdentityServerAspNetIdentity.Pages.Admin
+@model IdentityServerAspNetIdentity.Pages.Admin.AssignRoleModel
+@{
+    ViewData["Title"] = "Assign Roles";
+}
+
+<h2>Assign Roles</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <div class="form-group mb-3">
+                <label for="userId">User</label>
+                <select asp-for="UserId" class="form-control">
+                    <option value="">Select User</option>
+                    @foreach (var user in Model.Users)
+                    {
+                        <option value="@user.Id">@user.UserName</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group mb-3">
+                <label for="roleId">Role</label>
+                <select asp-for="RoleId" class="form-control">
+                    <option value="">Select Role</option>
+                    @foreach (var role in Model.Roles)
+                    {
+                        <option value="@role.Id">@role.Name</option>
+                    }
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Assign Role</button>
+        </form>
+    </div>
+</div>
+
+<hr />
+
+<h3>Current User Roles</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Roles</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model.Users)
+        {
+            <tr>
+                <td>@user.UserName</td>
+                <td>
+                    @string.Join(", ", Model.UserRoles[user.Id.ToString()])
+                </td>
+                <td>
+                    @foreach (var role in Model.UserRoles[user.Id.ToString()])
+                    {
+                        <form method="post" asp-page-handler="Remove" style="display: inline-block;"
+                              asp-route-userId="@user.Id" asp-route-roleName="@role">
+                            <button type="submit" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Remove @role role from @user.UserName?');">
+                                Remove @role
+                            </button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
