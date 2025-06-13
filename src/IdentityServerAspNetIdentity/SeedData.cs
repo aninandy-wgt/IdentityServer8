@@ -97,7 +97,8 @@ namespace IdentityServerAspNetIdentity//checking git sync
                 favoriteColor: "red",
                 givenName: "Alice",
                 familyName: "Smith",
-                (JwtClaimTypes.Name, "Alice Smith"),
+                (JwtClaimTypes.Name, "Alice Smith"), (JwtClaimTypes.GivenName, "Alice"),
+    (JwtClaimTypes.FamilyName, "Smith"),
                 (JwtClaimTypes.WebSite, "http://alice.example.com"),
                 ("location", "WGT CA office")
             );
@@ -108,7 +109,8 @@ namespace IdentityServerAspNetIdentity//checking git sync
                 password: "Pass123$",
                 favoriteColor: "blue",
                 givenName: "Bob",
-                familyName: "Smith",
+                familyName: "Smith", (JwtClaimTypes.GivenName, "Bob"),
+    (JwtClaimTypes.FamilyName, "Smith"),
                 (JwtClaimTypes.Name, "Bob Smith"),
                 (JwtClaimTypes.WebSite, "http://bob.example.com"),
                 ("location", "WGT CA office")
@@ -120,7 +122,8 @@ namespace IdentityServerAspNetIdentity//checking git sync
                 password: "Pass123$",
                 favoriteColor: "green",
                 givenName: "Tom",
-                familyName: "Smith",
+                familyName: "Smith", (JwtClaimTypes.GivenName, "Tom"),
+    (JwtClaimTypes.FamilyName, "Smith"),
                 (JwtClaimTypes.Name, "Tom Smith"),
                 (JwtClaimTypes.WebSite, "http://tom.example.com"),
                 ("location", "WGT SA office")
@@ -132,7 +135,8 @@ namespace IdentityServerAspNetIdentity//checking git sync
                 password: "Pass123$",
                 favoriteColor: "purple",
                 givenName: "John",
-                familyName: "Smith",
+                familyName: "Smith", (JwtClaimTypes.GivenName, "John"),
+    (JwtClaimTypes.FamilyName, "Smith"),
                 (JwtClaimTypes.Name, "John Smith"),
                 (JwtClaimTypes.WebSite, "http://john.example.com"),
                 ("location", "WGT CA office")

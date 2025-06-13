@@ -10,28 +10,6 @@ internal static class HostingExtensions
 {
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddRazorPages(options =>
-        {
-            options.Conventions.AuthorizeFolder("/");
-
-            options.Conventions.AuthorizeFolder("/Roles", "AAA_Admin");
-            
-            options.Conventions.AllowAnonymousToPage("/Roles/ListRoles"); 
-            options.Conventions.AuthorizePage("/Roles/ListRoles", "AAA_Viewer");
-
-            options.Conventions.AllowAnonymousToPage("/Roles/ListRoles");
-            options.Conventions.AuthorizePage("/Roles/ListRoles", "AAA_ProjectManager");
-            options.Conventions.AllowAnonymousToPage("/Roles/AssignRole");
-            options.Conventions.AuthorizePage("/Roles/AssignRole", "AAA_ProjectManager");
-
-            options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Login");
-            options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Register");
-            options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Logout");
-            options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ForgotPassword");
-            options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ResetPassword");
-            options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ConfirmEmail");
-        });
-
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(
                 builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -76,6 +54,16 @@ internal static class HostingExtensions
             });
 
         builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, CustomUserClaimsPrincipalFactory>();
+
+        builder.Services.AddRazorPages(options =>
+        {
+            options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Login");
+            options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Register");
+            options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Logout");
+            options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ForgotPassword");
+            options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ResetPassword");
+            options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ConfirmEmail");
+        });
 
         return builder.Build();
     }
