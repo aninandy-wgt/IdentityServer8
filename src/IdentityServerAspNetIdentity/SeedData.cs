@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Security.Claims;
 
-namespace IdentityServerAspNetIdentity//checking git sync
+namespace IdentityServerAspNetIdentity
 {
     public static class SeedData
     {
