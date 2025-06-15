@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Duende.IdentityModel.Client;
 
-// discover endpoints from metadata
 var client = new HttpClient();
 var disco = await client.GetDiscoveryDocumentAsync("https://localhost:5001");
 if (disco.IsError)
@@ -11,7 +10,6 @@ if (disco.IsError)
     return 1;
 }
 
-// request token
 var tokenResponse = await client.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
 {
     Address = disco.TokenEndpoint,
@@ -29,9 +27,8 @@ if (tokenResponse.IsError)
 
 Console.WriteLine(tokenResponse.AccessToken);
 
-// call api
 var apiClient = new HttpClient();
-apiClient.SetBearerToken(tokenResponse.AccessToken!); // AccessToken is always non-null when IsError is false
+apiClient.SetBearerToken(tokenResponse.AccessToken!);
 
 var response = await apiClient.GetAsync("https://localhost:6001/identity");
 if (!response.IsSuccessStatusCode)

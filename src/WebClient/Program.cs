@@ -46,6 +46,10 @@ builder.Services.AddAuthentication(options =>
 
         options.MapInboundClaims = false; // Don't rename claim types
 
+        options.Scope.Add("permissions");
+        options.GetClaimsFromUserInfoEndpoint = true;
+        options.ClaimActions.MapJsonKey("permission", "permission");
+
         options.SaveTokens = true;
     });
 builder.Services.AddOpenIdConnectAccessTokenManagement();
