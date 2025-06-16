@@ -4,33 +4,27 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace IdentityServerAspNetIdentity.Pages.Admin;
+namespace IdentityServerAspNetIdentity.Pages.Roles;
 
-[Authorize(Roles = "AAA_Admin,AAA_Viewer,AAA_ProjectManager")]//AAA_viewer not letting see roles
-public class ListRolesModel : PageModel
+[Authorize(Roles = "AAA_Admin,AAA_Viewer,AAA_ProjectManager")]
+public class ListRolesModel(RoleManager<ApplicationRole> roleManager) : PageModel
 {
-    private readonly RoleManager<ApplicationRole> _roleManager;
-
     public List<ApplicationRole> Roles { get; set; } = [];
-
-    public ListRolesModel(RoleManager<ApplicationRole> roleManager) => _roleManager = roleManager;
 
     public void OnGet()
     {
-        Roles = [.. _roleManager.Roles];
+        Roles = [.. roleManager.Roles];
     }
 
     public async Task<IActionResult> OnPostDeleteAsync(string id)
     {
-        var role = await _roleManager.FindByIdAsync(id);
+        var role = await roleManager.FindByIdAsync(id);
         if (role != null)
         {
-            var result = await _roleManager.DeleteAsync(role);
-            if (result.Succeeded)
-                return RedirectToPage();
+            var result = await roleManager.DeleteAsync(role);
+            if (result.Succeeded) return RedirectToPage();
 
-            foreach (var error in result.Errors)
-                ModelState.AddModelError("", error.Description);
+            foreach (var error in result.Errors) ModelState.AddModelError("", error.Description);
         }
         return Page();
     }
