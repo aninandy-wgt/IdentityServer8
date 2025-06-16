@@ -6,10 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace IdentityServerAspNetIdentity;
 
-public class CustomProfileService(
-    UserManager<ApplicationUser> userManager,
-    IUserClaimsPrincipalFactory<ApplicationUser> claimsFactory,
-    RoleManager<ApplicationRole> roleManager) : ProfileService<ApplicationUser>(userManager, claimsFactory)
+public class CustomProfileService(UserManager<ApplicationUser> userManager, IUserClaimsPrincipalFactory<ApplicationUser> claimsFactory, RoleManager<ApplicationRole> roleManager) : ProfileService<ApplicationUser>(userManager, claimsFactory)
 {
     protected override async Task GetProfileDataAsync(ProfileDataRequestContext context, ApplicationUser user)
     {
