@@ -7,10 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Duende.IdentityServer" Version="7.2.3" />
+    <PackageReference Include="Duende.IdentityServer" Version="7.2.4" />
 	 <PackageReference Include="Duende.AccessTokenManagement.OpenIdConnect" Version="2.1.2" />
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.0" />
 	</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IdentityServerAspNetIdentity\IdentityServerAspNetIdentity.csproj" />
+  </ItemGroup>
 
 
 </Project>

@@ -7,9 +7,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = "Cookies";
     options.DefaultChallengeScheme = "oidc";
-})
-    .AddCookie("Cookies")
-    .AddOpenIdConnect("oidc", options =>
+}).AddCookie("Cookies").AddOpenIdConnect("oidc", static options =>
     {
         options.Authority = "https://localhost:5005";
 
@@ -46,16 +44,12 @@ builder.Services.AddOpenIdConnectAccessTokenManagement();
 
 builder.Services.AddUserAccessTokenHttpClient("apiClient", configureClient: client =>
 {
-    client.BaseAddress = new Uri("https://localhost:6001");
+    client.BaseAddress = new Uri("https://localhost:6001/identity");
 });
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-}
+if (!app.Environment.IsDevelopment()) { app.UseExceptionHandler("/Error"); app.UseHsts(); }
 
 app.UseHttpsRedirection();
 
@@ -66,6 +60,6 @@ app.UseAuthorization();
 app.MapRazorPages().RequireAuthorization();
 
 app.MapStaticAssets();
-app.MapRazorPages().WithStaticAssets();
+//app.MapRazorPages().WithStaticAssets();
 
 app.Run();

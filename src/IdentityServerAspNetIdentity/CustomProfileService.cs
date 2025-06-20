@@ -14,7 +14,6 @@ public class CustomProfileService(UserManager<ApplicationUser> userManager, IUse
         var identity = (ClaimsIdentity)principal.Identity!;
 
         if (!string.IsNullOrEmpty(user.FavoriteColor)) identity.AddClaim(new Claim("favorite_color", user.FavoriteColor));
-        
 
         var roles = await userManager.GetRolesAsync(user);
         foreach (var roleName in roles)
@@ -25,7 +24,6 @@ public class CustomProfileService(UserManager<ApplicationUser> userManager, IUse
             {
                 var roleClaims = await roleManager.GetClaimsAsync(role);
                 foreach (var claim in roleClaims.Where(c => c.Type == "permission")) identity.AddClaim(claim);
-                
             }
         }
         context.AddRequestedClaims(identity.Claims);

@@ -11,10 +11,7 @@ public class ListRolesModel(RoleManager<ApplicationRole> roleManager) : PageMode
 {
     public List<ApplicationRole> Roles { get; set; } = [];
 
-    public void OnGet()
-    {
-        Roles = [.. roleManager.Roles];
-    }
+    public void OnGet() { Roles = [.. roleManager.Roles]; }
 
     public async Task<IActionResult> OnPostDeleteAsync(string id)
     {

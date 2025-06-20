@@ -3,7 +3,7 @@
   "iisSettings": {
     "iisExpress": {
       "applicationUrl": "http://localhost:58849/",
-      "sslPort": 44327
+      "sslPort": 58849
     }
   },
   "profiles": {
