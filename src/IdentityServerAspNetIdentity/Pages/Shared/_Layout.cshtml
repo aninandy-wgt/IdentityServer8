@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+@* <!DOCTYPE html>
 @using IdentityServerAspNetIdentity.Models
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
@@ -29,7 +29,6 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <!-- Your existing nav items from _Nav partial can go here -->
                     @if (SignInManager.IsSignedIn(User) && User.IsInRole("AAA_Admin"))
                     {
                         <ul class="navbar-nav">
@@ -76,5 +75,70 @@
 
     @RenderSection("scripts", required: false)
 </body>
-</html>
+</html>*@
+@using Microsoft.AspNetCore.Identity
+@using IdentityServerAspNetIdentity.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - IdentityServerAspNetIdentity</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="~/">IdentityServer</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <li class="nav-item">
+                            <form method="post" asp-area="Identity" asp-page="/Account/Logout" class="d-inline">
+                                <button type="submit" class="nav-link btn btn-link text-decoration-none">Logout</button>
+                            </form>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
 
+    <div class="container mt-4">
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <ul class="nav nav-pills mb-4">
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Roles/ListRoles">List Roles</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Roles/CreateRole">Create Role</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Roles/AssignRole">Assign Role</a>
+                </li>
+            </ul>
+        }
+
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

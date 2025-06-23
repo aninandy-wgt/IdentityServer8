@@ -1,28 +1,33 @@
 using IdentityServerAspNetIdentity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace IdentityServerAspNetIdentity.Pages.Roles;
-
-[Authorize(Roles = "AAA_Admin,AAA_Viewer,AAA_ProjectManager")]
-public class ListRolesModel(RoleManager<ApplicationRole> roleManager) : PageModel
+namespace IdentityServerAspNetIdentity.Pages.Roles
 {
-    public List<ApplicationRole> Roles { get; set; } = [];
-
-    public void OnGet() { Roles = [.. roleManager.Roles]; }
-
-    public async Task<IActionResult> OnPostDeleteAsync(string id)
+    [Authorize(Roles = $"{AppRoles.Admin},{AppRoles.Viewer},{AppRoles.ProjectManager}")]
+    public class ListRolesModel(RoleManager<ApplicationRole> roleManager) : PageModel
     {
-        var role = await roleManager.FindByIdAsync(id);
-        if (role != null)
-        {
-            var result = await roleManager.DeleteAsync(role);
-            if (result.Succeeded) return RedirectToPage();
+        public List<RoleWithClaims> RolesWithClaims { get; set; } = [];
 
-            foreach (var error in result.Errors) ModelState.AddModelError("", error.Description);
+        public async Task OnGetAsync()
+        {
+            var roles = roleManager.Roles.ToList();
+            foreach (var role in roles)
+            {
+                var claims = await roleManager.GetClaimsAsync(role);
+                RolesWithClaims.Add(new RoleWithClaims
+                {
+                    RoleName = role.Name!,
+                    Permissions = [.. claims.Where(c => c.Type == "permission").Select(c => c.Value)]
+                });
+            }
         }
-        return Page();
+    }
+
+    public class RoleWithClaims
+    {
+        public string RoleName { get; set; } = "";
+        public List<string> Permissions { get; set; } = [];
     }
 }

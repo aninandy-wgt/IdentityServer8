@@ -1,0 +1,13 @@
+﻿@page
+@model WebClient.Pages.User.DashboardModel
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Policy = "User")]
+
+<h1>User Dashboard</h1>
+
+<p>Welcome, @User.Identity.Name! You’re in the <strong>AWARE_User</strong> role.</p>
+
+<ul>
+  <li><a asp-page="/Project/View">View Projects</a></li>
+  <!-- …other user‐level links… -->
+</ul>

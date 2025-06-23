@@ -1,0 +1,15 @@
+﻿@page
+@model WebClient.Pages.Admin.DashboardModel
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Policy = "Admin")]
+
+<h1>Admin Dashboard</h1>
+
+<p>Welcome, @User.Identity.Name! You’re in the <strong>AWARE_Admin</strong> role.</p>
+
+<ul>
+  <li><a asp-page="/Roles/ListRoles">Manage Roles</a></li>
+  <li><a asp-page="/Roles/CreateRole">Create New Role</a></li>
+  <li><a asp-page="/Roles/AssignRole">Assign Roles to Users</a></li>
+  <!-- …other admin links… -->
+</ul>

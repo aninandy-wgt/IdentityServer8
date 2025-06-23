@@ -23,7 +23,7 @@ namespace IdentityServerAspNetIdentity.Areas.Identity.Pages.Account
         {
        
             [Required]
-            public string? Email { get; set; }
+            public string? Username { get; set; }
 
             [Required]
             [DataType(DataType.Password)]
@@ -52,7 +52,7 @@ namespace IdentityServerAspNetIdentity.Areas.Identity.Pages.Account
 
             if (!ModelState.IsValid) return Page();
 
-            var identifier = Input.Email;
+            var identifier = Input.Username;
             var user = await userManager.FindByEmailAsync(identifier) ?? await userManager.FindByNameAsync(identifier);
 
             if (user == null)

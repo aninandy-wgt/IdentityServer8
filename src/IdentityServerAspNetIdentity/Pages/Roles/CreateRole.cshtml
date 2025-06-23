@@ -5,24 +5,24 @@
     ViewData["Title"] = "Create Role";
 }
 
-<h2>Create Role</h2>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="RoleName" class="control-label"></label>
-                <input asp-for="RoleName" class="form-control" />
-                <span asp-validation-for="RoleName" class="text-danger"></span>
-            </div>
-            <div class="form-group mt-3">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+<h2>Create a new Role</h2>
 
-<div>
-    <a asp-page="ListRoles">Back to List</a>
-</div>
+<form method="post">
+    <div class="form-group">
+        <label asp-for="RoleName">Role Name</label>
+        <input asp-for="RoleName" class="form-control" />
+        <span asp-validation-for="RoleName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PermissionsInput">
+            Permissions <small>(comma-separated)</small>
+        </label>
+        <input asp-for="PermissionsInput" class="form-control"
+               placeholder="AAA.RoleManagement.AddRole, AAA.RoleManagement.ListRoles, AAA.UserManagement.AssignRole" />
+        <span asp-validation-for="PermissionsInput" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Role</button>
+    <a asp-page="ListRoles" class="btn btn-secondary">Cancel</a>
+</form>

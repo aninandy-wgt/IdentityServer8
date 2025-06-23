@@ -1,0 +1,44 @@
+﻿@page "{roleName}"
+@model IdentityServerAspNetIdentity.Pages.Roles.EditRoleModel
+@{
+    ViewData["Title"] = $"Edit Role \"{Model.RoleName}\"";
+}
+
+<h2>Edit Permissions for @Model.RoleName</h2>
+
+<form method="post">
+  <div class="form-group">
+    <label>Existing Permissions</label>
+    @if (Model.Permissions.Any())
+    {
+      <ul>
+        @foreach (var perm in Model.Permissions)
+        {
+          <li>
+            @perm
+            <button type="submit" 
+                    name="removePermission" 
+                    value="@perm" 
+                    class="btn btn-sm btn-link text-danger">
+              Remove
+            </button>
+          </li>
+        }
+      </ul>
+    }
+    else
+    {
+      <p><em>(no permissions assigned)</em></p>
+    }
+  </div>
+
+  <div class="form-group">
+    <label>Add Permissions <small>(comma-separated)</small></label>
+    <input asp-for="NewPermissions" class="form-control"
+           placeholder="e.g. AAA.UserManagement.AddUser, AAA.UserManagement.EditUser" />
+    <span asp-validation-for="NewPermissions" class="text-danger"></span>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Save</button>
+  <a asp-page="ListRoles" class="btn btn-secondary">Back to list</a>
+</form>

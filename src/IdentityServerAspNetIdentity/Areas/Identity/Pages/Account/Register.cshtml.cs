@@ -1,20 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using IdentityServerAspNetIdentity.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
 
 namespace IdentityServerAspNetIdentity.Areas.Identity.Pages.Account
 {
@@ -66,13 +59,13 @@ namespace IdentityServerAspNetIdentity.Areas.Identity.Pages.Account
         public async Task OnGetAsync(string? returnUrl = null)
         {
             ReturnUrl = returnUrl;
-            ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            ExternalLogins = [.. await signInManager.GetExternalAuthenticationSchemesAsync()];
         }
 
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
-            ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            ExternalLogins = [.. await signInManager.GetExternalAuthenticationSchemesAsync()];
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = Input.Username, Email = Input.Email, GivenName = Input.GivenName, FamilyName = Input.FamilyName, FavoriteColor = Input.FavoriteColor };
@@ -81,16 +74,16 @@ namespace IdentityServerAspNetIdentity.Areas.Identity.Pages.Account
                 {
                     logger.LogInformation("User created a new account with password.");
 
-                    await userManager.AddClaimsAsync(user, new[]
-                    {
+                    await userManager.AddClaimsAsync(user,
+                    [
                         new Claim(Duende.IdentityModel.JwtClaimTypes.GivenName, user.GivenName ?? ""),
                         new Claim(Duende.IdentityModel.JwtClaimTypes.FamilyName, user.FamilyName ?? ""),
                         new Claim("favorite_color", user.FavoriteColor ?? "")
-                    });
+                    ]);
 
                     var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    _ = Url.Page("/Account/ConfirmEmail", pageHandler: null, values: new { area = "Identity", userId = user.Id, code, returnUrl }, protocol: Request.Scheme);
+                    Url.Page("/Account/ConfirmEmail", pageHandler: null, values: new { area = "Identity", userId = user.Id, code, returnUrl }, protocol: Request.Scheme);
 
                     if (userManager.Options.SignIn.RequireConfirmedAccount) return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl });
                     else

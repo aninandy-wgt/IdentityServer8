@@ -30,7 +30,7 @@ try
     if (args.Contains("/seed")) { Log.Information("Seeding database..."); await SeedData.EnsureSeedData(app); Log.Information("Done seeding database. Exiting."); return; }
 
     app.UseSwagger();
-    app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "STS Admin API v1"); c.RoutePrefix = "swagger"; });
+    app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "IdentityServer API v1"); c.RoutePrefix = "swagger"; });
 
     app.MapGet("/api/clients", async ([FromServices] ConfigurationDbContext cfg) =>
     {
@@ -44,7 +44,7 @@ try
                 RedirectUris = c.RedirectUris.Select(r => r.RedirectUri),
                 PostLogoutRedirectUris = c.PostLogoutRedirectUris.Select(p => p.PostLogoutRedirectUri),
             }).ToListAsync(); return Results.Ok(clients);
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapGet("/api/identity-resources", async ([FromServices] ConfigurationDbContext cfg) =>
     {
@@ -54,7 +54,7 @@ try
                 r.Name,
                 UserClaims = r.UserClaims.Select(uc => uc.Type)
             }).ToListAsync(); return Results.Ok(idrs);
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapGet("/api/api-scopes", async ([FromServices] ConfigurationDbContext cfg) =>
     {
@@ -64,7 +64,7 @@ try
                 s.Name,
                 UserClaims = s.UserClaims.Select(uc => uc.Type)
             }).ToListAsync(); return Results.Ok(scopes);
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapGet("/api/resources", async ([FromServices] ConfigurationDbContext cfg) =>
     {
@@ -75,7 +75,7 @@ try
                 Scopes = r.Scopes.Select(s => s.Scope),
                 UserClaims = r.UserClaims.Select(uc => uc.Type)
         }).ToListAsync(); return Results.Ok(resources);
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapGet("/api/users", async ([FromServices] UserManager<ApplicationUser> userMgr) =>
     {
@@ -89,7 +89,7 @@ try
                 u.PhoneNumberConfirmed
             })
             .ToListAsync(); return Results.Ok(users);
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapGet("/api/users/{userId}", async ([FromServices] UserManager<ApplicationUser> userMgr, string userId) =>
     {
@@ -103,13 +103,13 @@ try
                 user.EmailConfirmed,
                 user.PhoneNumberConfirmed
             });
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapGet("/api/users/{userId}/roles", async ([FromServices] UserManager<ApplicationUser> userMgr, string userId) =>
     {
         var user = await userMgr.FindByIdAsync(userId);
         return user == null ? Results.NotFound() : Results.Ok(await userMgr.GetRolesAsync(user));
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapPost("/api/users/{userId}/roles", async ([FromServices] UserManager<ApplicationUser> userMgr, string userId, [FromBody] string roleName) =>
     {
@@ -118,7 +118,7 @@ try
 
         var result = await userMgr.AddToRoleAsync(user, roleName);
         return result.Succeeded ? Results.Ok() : Results.BadRequest(result.Errors);
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapPost("/api/users", async ([FromServices] UserManager<ApplicationUser> userMgr, [FromBody] ApplicationUser newUser) =>
     {
@@ -128,7 +128,7 @@ try
         
         var result = await userMgr.CreateAsync(newUser, "DefaultPassword123!");
         return result.Succeeded ? Results.Ok() : Results.BadRequest(result.Errors);
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapDelete("/api/users/{userId}", async ([FromServices] UserManager<ApplicationUser> userMgr, string userId) =>
     {
@@ -137,7 +137,7 @@ try
 
         var result = await userMgr.DeleteAsync(user);
         return result.Succeeded ? Results.Ok() : Results.BadRequest(result.Errors);
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapPost("/api/users/{userId}/password", async ([FromServices] UserManager<ApplicationUser> userMgr, string userId, [FromBody] string newPassword) =>
     {
@@ -146,13 +146,13 @@ try
 
         var result = await userMgr.ChangePasswordAsync(user, "DefaultPassword123!", newPassword);
         return result.Succeeded ? Results.Ok() : Results.BadRequest(result.Errors);
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapGet("/api/roles", async ([FromServices] RoleManager<ApplicationRole> roleMgr) =>
     {
         var roles = await roleMgr.Roles.Select(r => new { r.Id, r.Name }).ToListAsync();
         return Results.Ok(roles);
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapPost("/api/roles", async ([FromServices] RoleManager<ApplicationRole> roleMgr, [FromBody] string roleName) =>
     {
@@ -160,7 +160,7 @@ try
         
         var result = await roleMgr.CreateAsync(new ApplicationRole { Name = roleName });
         return result.Succeeded ? Results.Ok() : Results.BadRequest(result.Errors);
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapDelete("/api/roles/{roleName}", async ([FromServices] RoleManager<ApplicationRole> roleMgr, string roleName) =>
     {
@@ -169,7 +169,7 @@ try
         
         var result = await roleMgr.DeleteAsync(role);
         return result.Succeeded ? Results.Ok() : Results.BadRequest(result.Errors);
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapGet("/api/roles/{roleName}/claims", async ([FromServices] RoleManager<ApplicationRole> roleMgr, string roleName) =>
     {
@@ -178,7 +178,7 @@ try
         
         var claims = await roleMgr.GetClaimsAsync(role);
         return Results.Ok(claims.Select(c => new { c.Type, c.Value }));
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapPost("/api/roles/{roleName}/claims", async ([FromServices] RoleManager<ApplicationRole> roleMgr, string roleName, [FromBody] Dictionary<string, string> body) =>
     {
@@ -189,7 +189,7 @@ try
 
         var result = await roleMgr.AddClaimAsync(role, new System.Security.Claims.Claim(type, value));
         return result.Succeeded ? Results.Ok() : Results.BadRequest(result.Errors);
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.MapDelete("/api/roles/{roleName}/claims", async ([FromServices] RoleManager<ApplicationRole> roleMgr, string roleName, [FromBody] Dictionary<string, string> body) =>
     {
@@ -200,7 +200,7 @@ try
 
         var result = await roleMgr.RemoveClaimAsync(role, new System.Security.Claims.Claim(type, value));
         return result.Succeeded ? Results.Ok() : Results.BadRequest(result.Errors);
-    }).RequireAuthorization("AAA_Admin");
+    });
 
     app.Run();
 }

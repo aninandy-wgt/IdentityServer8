@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IdentityServerAspNetIdentity.Pages.Roles;
 
-[Authorize(Roles = "AAA_Admin,AAA_ProjectManager")]
+[Authorize(Roles = $"{AppRoles.Admin},{AppRoles.ProjectManager}")]
 public class AssignRoleModel(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager) : PageModel
 {
     [BindProperty]
