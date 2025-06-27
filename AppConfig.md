@@ -30,8 +30,6 @@ In the IdentityServer Swagger UI, open the **POST/api/clients** endpoint and pas
   ]
 }
 ````
-
-
 | Property | Description |
 | :------- | :---------- |
 | **clientId** | A unique identifier for your app—change to match your app’s name (e.g. `DemoApp`). |
