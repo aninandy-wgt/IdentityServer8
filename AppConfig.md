@@ -142,24 +142,4 @@ app.MapRazorPages().RequireAuthorization();
 app.MapStaticAssets();
 app.Run();
 ```
-
-### Key Points
-
-1. `** / **`
-
-   * Sets up OIDC code flow (`ResponseType = "code"`) and cookie session.
-
-2. **Scopes & Claims**
-
-   * Call `options.Scope.Add(...)` for every server-side scope.
-   * Use `MapJsonKey` / `MapUniqueJsonKey` to pull custom claims into your user principal.
-
-3. \`\`
-
-   * Adding this scope + `AddOpenIdConnectAccessTokenManagement()` enables silent token renewal and persists a grant entry under **/grants**.
-
-4. **Authorization Policies**
-
-   * Define `Admin` / `User` roles to secure pages or API calls.
-
-With this file in place—your IdentityServer client JSON registration and matching DemoApp configuration—your `daaa` client will be fully integrated, appear under `/grants`, and support sign-in, refresh tokens, and role-based authorization end to end.
+With this file in place— IdentityServer client JSON registration and matching DemoApp configuration—`daaa` client will be fully integrated, appear under `/grants`, and support sign-in, refresh tokens, and role-based authorization end to end.
