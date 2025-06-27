@@ -9,7 +9,7 @@ Below is a detailed, step-by-step guide to registering a new client in IdentityS
 In the IdentityServer Swagger UI, open the **POST/api/clients** endpoint and paste the following JSON payload to register your new application:
 ````json
 {
-  "clientId": "<your-client-id>",   // replace with your own client identifier (e.g., "daaa")
+  "clientId": "<your-client-id>",   // replace with own client id (ex. "daaa")
   "clientName": null,       
   "secret": "secret",
   "redirectUris": [
