@@ -173,6 +173,3 @@ app.Run();
    * Define `Admin` / `User` roles to secure pages or API calls.
 
 With this file in place—your IdentityServer client JSON registration and matching DemoApp configuration—your `daaa` client will be fully integrated, appear under `/grants`, and support sign-in, refresh tokens, and role-based authorization end to end.
-
-```
-```
