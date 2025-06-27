@@ -1,4 +1,4 @@
-````markdown
+
 # DemoApp IdentityServer Integration Guide
 
 Below is a detailed, step-by-step guide to registering a new client in IdentityServer and wiring it up in your DemoApp’s `Program.cs`.
@@ -7,7 +7,7 @@ Below is a detailed, step-by-step guide to registering a new client in IdentityS
 ## 1. Registering a New Client in IdentityServer
 
 In the IdentityServer Swagger UI, open the **POST/api/clients** endpoint and paste the following JSON payload to register your new application:
-
+````markdown
 {
   "clientId": "<your-client-id>",   // replace with your own client identifier (e.g., "daaa")
   "clientName": "<your-app-name>",   // replace with your application's display name         // human-friendly name; clearly distinct from clientId
