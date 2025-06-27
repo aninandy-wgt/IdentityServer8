@@ -21,7 +21,7 @@ public class ViewModel
                 return;
             }
         }
-        Clients = Enumerable.Empty<string>();
+        Clients = [];
     }
 
     public AuthenticateResult AuthenticateResult { get; }

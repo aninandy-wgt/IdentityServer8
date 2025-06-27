@@ -80,7 +80,7 @@ public class Index : PageModel
                 grantedConsent = new ConsentResponse
                 {
                     RememberConsent = Input.RememberConsent,
-                    ScopesValuesConsented = scopes.ToArray(),
+                    ScopesValuesConsented = [.. scopes],
                     Description = Input.Description
                 };
 
@@ -153,9 +153,7 @@ public class Index : PageModel
             AllowRememberConsent = request.Client.AllowRememberConsent
         };
 
-        vm.IdentityScopes = request.ValidatedResources.Resources.IdentityResources
-            .Select(x => CreateScopeViewModel(x, Input == null || Input.ScopesConsented.Contains(x.Name)))
-            .ToArray();
+        vm.IdentityScopes = [.. request.ValidatedResources.Resources.IdentityResources.Select(x => CreateScopeViewModel(x, Input == null || Input.ScopesConsented.Contains(x.Name)))];
 
         var resourceIndicators = request.Parameters.GetValues(OidcConstants.AuthorizeRequest.Resource) ?? Enumerable.Empty<string>();
         var apiResources = request.ValidatedResources.Resources.ApiResources.Where(x => resourceIndicators.Contains(x.Name));
@@ -167,12 +165,12 @@ public class Index : PageModel
             if (apiScope != null)
             {
                 var scopeVm = CreateScopeViewModel(parsedScope, apiScope, Input == null || Input.ScopesConsented.Contains(parsedScope.RawValue));
-                scopeVm.Resources = apiResources.Where(x => x.Scopes.Contains(parsedScope.ParsedName))
+                scopeVm.Resources = [.. apiResources.Where(x => x.Scopes.Contains(parsedScope.ParsedName))
                     .Select(x => new ResourceViewModel
                     {
                         Name = x.Name,
                         DisplayName = x.DisplayName ?? x.Name,
-                    }).ToArray();
+                    })];
                 apiScopes.Add(scopeVm);
             }
         }

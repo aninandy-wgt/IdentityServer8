@@ -1,9 +1,7 @@
 ﻿@page
 @using IdentityServerAspNetIdentity.Pages.Roles
 @model IdentityServerAspNetIdentity.Pages.Roles.CreateRoleModel
-@{
-    ViewData["Title"] = "Create Role";
-}
+@{    ViewData["Title"] = "Create Role";}
 
 <h2>Create a new Role</h2>
 
@@ -19,7 +17,7 @@
             Permissions <small>(comma-separated)</small>
         </label>
         <input asp-for="PermissionsInput" class="form-control"
-               placeholder="AAA.RoleManagement.AddRole, AAA.RoleManagement.ListRoles, AAA.UserManagement.AssignRole" />
+               placeholder="AAA.RoleManagement.AddRoles, AAA.RoleManagement.ListRoles, AAA.RoleManagement.AssignRole" />
         <span asp-validation-for="PermissionsInput" class="text-danger"></span>
     </div>
 

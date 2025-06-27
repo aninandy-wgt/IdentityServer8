@@ -21,7 +21,7 @@ namespace IdentityServerAspNetIdentity.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-       
+
             [Required]
             public string? Username { get; set; }
 
@@ -36,12 +36,12 @@ namespace IdentityServerAspNetIdentity.Areas.Identity.Pages.Account
         public async Task OnGetAsync(string returnUrl = null)
         {
             if (!string.IsNullOrEmpty(ErrorMessage)) ModelState.AddModelError(string.Empty, ErrorMessage);
-            
+
             returnUrl ??= Url.Content("~/");
 
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-            ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            ExternalLogins = [.. (await signInManager.GetExternalAuthenticationSchemesAsync())];
 
             ReturnUrl = returnUrl;
         }
@@ -68,8 +68,8 @@ namespace IdentityServerAspNetIdentity.Areas.Identity.Pages.Account
                 logger.LogInformation("User logged in.");
                 return LocalRedirect(returnUrl);
             }
-            if (result.RequiresTwoFactor) return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, Input.RememberMe });
-            if (result.IsLockedOut) return RedirectToPage("./Lockout");
+            // if (result.RequiresTwoFactor) return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, Input.RememberMe });
+            //if (result.IsLockedOut) return RedirectToPage("./Lockout");
 
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             return Page();

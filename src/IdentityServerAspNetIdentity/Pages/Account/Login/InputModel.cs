@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace IdentityServerAspNetIdentity.Pages.Login;
+namespace IdentityServerAspNetIdentity.Pages.Account.Login;
 
 public class InputModel
 {

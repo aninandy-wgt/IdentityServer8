@@ -15,25 +15,22 @@ public static class SeedData
     public static async Task EnsureSeedData(WebApplication app)
     {
         using var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-        var sp = scope.ServiceProvider;
 
-        var db = sp.GetRequiredService<ApplicationDbContext>();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         db.Database.EnsureDeleted();
         db.Database.Migrate();
 
-        var configDb = sp.GetRequiredService<ConfigurationDbContext>();
+        var configDb = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
         configDb.Database.Migrate();
 
-        var persistedGrantDb = sp.GetRequiredService<PersistedGrantDbContext>();
-        persistedGrantDb.Database.Migrate();
+        scope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
 
-        var userMgr = sp.GetRequiredService<UserManager<ApplicationUser>>();
-        var roleMgr = sp.GetRequiredService<RoleManager<ApplicationRole>>();
+        var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
 
         foreach (var r in (string[])[AppRoles.Admin, AppRoles.ProjectManager, AppRoles.Viewer])
         {
-            var exists = await roleMgr.RoleExistsAsync(r);
-            if (!exists)
+            if (!await roleMgr.RoleExistsAsync(r))
             {
                 var roleResult = await roleMgr.CreateAsync(new ApplicationRole { Name = r });
                 if (!roleResult.Succeeded) throw new Exception(roleResult.Errors.First().Description);
@@ -64,11 +61,7 @@ public static class SeedData
     private static async Task AddRoleClaims(RoleManager<ApplicationRole> roleMgr, string roleName, string[] permissions)
     {
         var role = await roleMgr.FindByNameAsync(roleName);
-        if (role != null)
-        {
-            var existingClaims = await roleMgr.GetClaimsAsync(role);
-            foreach (var permission in permissions) if (!existingClaims.Any(c => c.Type == "permission" && c.Value == permission)) await roleMgr.AddClaimAsync(role, new Claim("permission", permission));
-        }
+        if (role != null) foreach (var permission in permissions) if (!(await roleMgr.GetClaimsAsync(role)).Any(c => c.Type == "permission" && c.Value == permission)) await roleMgr.AddClaimAsync(role, new Claim("permission", permission));
     }
 
     private static async Task SeedUser(UserManager<ApplicationUser> userMgr, string userName, string email, string password, string favoriteColor, string givenName, string familyName, params (string Type, string Value)[] extraClaims)
@@ -76,37 +69,20 @@ public static class SeedData
         var user = await userMgr.FindByNameAsync(userName);
         if (user == null)
         {
-            user = new ApplicationUser
-            {
-                UserName = userName,
-                Email = email,
-                EmailConfirmed = true,
-                FavoriteColor = favoriteColor,
-                GivenName = givenName,
-                FamilyName = familyName
-            };
+            user = new ApplicationUser { UserName = userName, Email = email, EmailConfirmed = true, FavoriteColor = favoriteColor, GivenName = givenName, FamilyName = familyName };
             var createResult = await userMgr.CreateAsync(user, password);
             if (!createResult.Succeeded) throw new Exception(createResult.Errors.First().Description);
 
-            var claimList = extraClaims.Select(c => new Claim(c.Type, c.Value)).ToArray();
-            var claimResult = await userMgr.AddClaimsAsync(user, claimList);
+            var claimResult = await userMgr.AddClaimsAsync(user, [.. extraClaims.Select(c => new Claim(c.Type, c.Value))]);
             if (!claimResult.Succeeded) throw new Exception(claimResult.Errors.First().Description);
 
             Log.Debug($"{userName} created");
         }
         else
         {
-            var mustUpdate = false;
-            if (user.GivenName != givenName)
-            {
-                user.GivenName = givenName;
-                mustUpdate = true;
-            }
-            if (user.FamilyName != familyName)
-            {
-                user.FamilyName = familyName;
-                mustUpdate = true;
-            }
+            bool mustUpdate = false;
+            if (user.GivenName != givenName) { user.GivenName = givenName; mustUpdate = true; }
+            if (user.FamilyName != familyName) { user.FamilyName = familyName; mustUpdate = true; }
             if (mustUpdate)
             {
                 var updateResult = await userMgr.UpdateAsync(user);
@@ -121,28 +97,24 @@ public static class SeedData
         if (!context.Clients.Any())
         {
             foreach (var client in Config.Clients) context.Clients.Add(client.ToEntity());
-            
             await context.SaveChangesAsync();
         }
 
         if (!context.IdentityResources.Any())
         {
             foreach (var resource in Config.IdentityResources) context.IdentityResources.Add(resource.ToEntity());
-
             await context.SaveChangesAsync();
         }
 
         if (!context.ApiScopes.Any())
         {
             foreach (var apiScope in Config.ApiScopes) context.ApiScopes.Add(apiScope.ToEntity());
-            
             await context.SaveChangesAsync();
         }
 
         if (Config.ApiResources != null && !context.ApiResources.Any())
         {
             foreach (var apiResource in Config.ApiResources) context.ApiResources.Add(apiResource.ToEntity());
-            
             await context.SaveChangesAsync();
         }
     }

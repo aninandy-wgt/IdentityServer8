@@ -39,7 +39,7 @@ namespace IdentityServerAspNetIdentity.Pages.Roles
                 var perms = PermissionsInput.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(p => p.Trim());
 
                 foreach (var perm in perms) await roleManager.AddClaimAsync(role, new Claim("permission", perm));
-              
+
             }
             return RedirectToPage("ListRoles");
         }

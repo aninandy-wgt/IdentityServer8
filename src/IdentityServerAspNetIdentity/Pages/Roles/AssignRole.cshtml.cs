@@ -12,7 +12,7 @@ public class AssignRoleModel(UserManager<ApplicationUser> userManager, RoleManag
 {
     [BindProperty]
     public required string UserId { get; set; }
-    
+
     [BindProperty]
     public required string RoleId { get; set; }
 
@@ -25,8 +25,8 @@ public class AssignRoleModel(UserManager<ApplicationUser> userManager, RoleManag
         Users = await userManager.Users.ToListAsync();
         Roles = await roleManager.Roles.ToListAsync();
 
-        foreach (var user in Users) UserRoles[user.Id.ToString()] = (await userManager.GetRolesAsync(user)).ToList();
-        
+        foreach (var user in Users) UserRoles[user.Id.ToString()] = [.. (await userManager.GetRolesAsync(user))];
+
     }
 
     public async Task<IActionResult> OnPostAsync()

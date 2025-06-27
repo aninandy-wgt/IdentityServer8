@@ -1,81 +1,3 @@
-@* <!DOCTYPE html>
-@using IdentityServerAspNetIdentity.Models
-@using Microsoft.AspNetCore.Identity
-@inject SignInManager<ApplicationUser> SignInManager
-
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
-
-    <title>Duende IdentityServer</title>
-    
-    <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
-    <link rel="shortcut icon" type="image/x-icon" href="~/favicon.ico" />
-    
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/lib/bootstrap4-glyphicons/css/bootstrap-glyphicons.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="~/">Duende IdentityServer</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    @if (SignInManager.IsSignedIn(User) && User.IsInRole("AAA_Admin"))
-                    {
-                        <ul class="navbar-nav">
-                            <li class="nav-item">
-                                <span class="navbar-text">Hello @User.Identity?.Name your are Admin of AAA!</span>
-                            </li>
-                            <li class="nav-item">
-                                <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout">
-                                    <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-                                </form>
-                            </li>
-                        </ul>
-                    }
-                </ul>
-                @if (SignInManager.IsSignedIn(User) && !User.IsInRole("AAA_Admin"))
-                {
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <span class="navbar-text">Hello @User.Identity?.Name!</span>
-                        </li>
-                        <li class="nav-item">
-                            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout">
-                                <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-                            </form>
-                        </li>
-                    </ul>
-                }
-                @if (User.IsInRole("AAA_Admin"))
-                {
-                    <a class="nav-link" asp-page="/Roles/AssignRole">Assign a roles to user</a>
-                    <a class="nav-link" asp-page="/Roles/CreateRole">Create roles</a>
-                    <a class="nav-link" asp-page="/Roles/ListRoles">View all roles</a>
-                }
-            </div>
-        </div>
-    </nav>
-
-    <div class="container body-container">
-        @RenderBody()
-    </div>
-
-    <script src="~/lib/jquery/dist/jquery.slim.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-    @RenderSection("scripts", required: false)
-</body>
-</html>*@
 @using Microsoft.AspNetCore.Identity
 @using IdentityServerAspNetIdentity.Models
 @inject SignInManager<ApplicationUser> SignInManager
@@ -85,14 +7,14 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - IdentityServerAspNetIdentity</title>
+    <title>@ViewData["Title"] - AAA</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="~/">IdentityServer</a>
+            <a class="navbar-brand" href="~/">AAA</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>

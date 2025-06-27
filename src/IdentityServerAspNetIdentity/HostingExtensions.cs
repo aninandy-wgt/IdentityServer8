@@ -25,15 +25,15 @@ internal static class HostingExtensions
 
         builder.Services.AddIdentityServer(options =>
         {
-                options.Events.RaiseErrorEvents = true;
-                options.Events.RaiseInformationEvents = true;
-                options.Events.RaiseFailureEvents = true;
-                options.Events.RaiseSuccessEvents = true;
-                options.UserInteraction.LoginUrl = "/Identity/Account/Login";
-                options.UserInteraction.LogoutUrl = "/Identity/Account/Logout";
-                options.UserInteraction.ConsentUrl = "/Identity/Consent";
-                options.UserInteraction.ErrorUrl = "/Identity/Account/Error";
-                options.UserInteraction.DeviceVerificationUrl = "/Identity/Account/Device";
+            options.Events.RaiseErrorEvents = true;
+            options.Events.RaiseInformationEvents = true;
+            options.Events.RaiseFailureEvents = true;
+            options.Events.RaiseSuccessEvents = true;
+            options.UserInteraction.LoginUrl = "/Identity/Account/Login";
+            options.UserInteraction.LogoutUrl = "/Identity/Account/Logout";
+            options.UserInteraction.ConsentUrl = "/Identity/Consent";
+            options.UserInteraction.ErrorUrl = "/Identity/Account/Error";
+            options.UserInteraction.DeviceVerificationUrl = "/Identity/Account/Device";
         }).AddConfigurationStore(options =>
         {
             options.ConfigureDbContext = b => b.UseNpgsql(connectionString, npgsql => npgsql.MigrationsAssembly(migrationsAssembly));
@@ -65,7 +65,7 @@ internal static class HostingExtensions
         app.UseSerilogRequestLogging();
 
         if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
-        
+
         app.UseStaticFiles();
         app.UseRouting();
         app.UseIdentityServer();

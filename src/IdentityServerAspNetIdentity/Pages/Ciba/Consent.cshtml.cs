@@ -82,7 +82,7 @@ public class Consent : PageModel
 
                 result = new CompleteBackchannelLoginRequest(Input.Id)
                 {
-                    ScopesValuesConsented = scopes.ToArray(),
+                    ScopesValuesConsented = [.. scopes],
                     Description = Input.Description
                 };
 
@@ -145,11 +145,9 @@ public class Consent : PageModel
             BindingMessage = request.BindingMessage
         };
 
-        vm.IdentityScopes = request.ValidatedResources.Resources.IdentityResources
-            .Select(x => CreateScopeViewModel(x, Input == null || Input.ScopesConsented.Contains(x.Name)))
-            .ToArray();
+        vm.IdentityScopes = [.. request.ValidatedResources.Resources.IdentityResources.Select(x => CreateScopeViewModel(x, Input == null || Input.ScopesConsented.Contains(x.Name)))];
 
-        var resourceIndicators = request.RequestedResourceIndicators ?? Enumerable.Empty<string>();
+        var resourceIndicators = request.RequestedResourceIndicators ?? [];
         var apiResources = request.ValidatedResources.Resources.ApiResources.Where(x => resourceIndicators.Contains(x.Name));
 
         var apiScopes = new List<ScopeViewModel>();
@@ -159,12 +157,12 @@ public class Consent : PageModel
             if (apiScope != null)
             {
                 var scopeVm = CreateScopeViewModel(parsedScope, apiScope, Input == null || Input.ScopesConsented.Contains(parsedScope.RawValue));
-                scopeVm.Resources = apiResources.Where(x => x.Scopes.Contains(parsedScope.ParsedName))
+                scopeVm.Resources = [.. apiResources.Where(x => x.Scopes.Contains(parsedScope.ParsedName))
                     .Select(x => new ResourceViewModel
                     {
                         Name = x.Name,
                         DisplayName = x.DisplayName ?? x.Name,
-                    }).ToArray();
+                    })];
                 apiScopes.Add(scopeVm);
             }
         }

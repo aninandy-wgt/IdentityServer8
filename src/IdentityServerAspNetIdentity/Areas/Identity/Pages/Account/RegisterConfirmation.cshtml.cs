@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System.Text;
-using System.Threading.Tasks;
 using IdentityServerAspNetIdentity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -25,7 +24,7 @@ namespace IdentityServerAspNetIdentity.Areas.Identity.Pages.Account
 
             var user = await userManager.FindByEmailAsync(email);
             if (user == null) return NotFound($"Unable to load user with email '{email}'.");
-            
+
 
             Email = email;
             DisplayConfirmAccountLink = true;

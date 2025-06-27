@@ -8,8 +8,8 @@ public class ViewModel
 
     public string? BindingMessage { get; set; }
 
-    public IEnumerable<ScopeViewModel> IdentityScopes { get; set; } = Enumerable.Empty<ScopeViewModel>();
-    public IEnumerable<ScopeViewModel> ApiScopes { get; set; } = Enumerable.Empty<ScopeViewModel>();
+    public IEnumerable<ScopeViewModel> IdentityScopes { get; set; } = [];
+    public IEnumerable<ScopeViewModel> ApiScopes { get; set; } = [];
 }
 
 public class ScopeViewModel
@@ -21,7 +21,7 @@ public class ScopeViewModel
     public bool Emphasize { get; set; }
     public bool Required { get; set; }
     public bool Checked { get; set; }
-    public IEnumerable<ResourceViewModel> Resources { get; set; } = Enumerable.Empty<ResourceViewModel>();
+    public IEnumerable<ResourceViewModel> Resources { get; set; } = [];
 }
 
 public class ResourceViewModel
