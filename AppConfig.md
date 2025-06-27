@@ -10,7 +10,7 @@ In the IdentityServer Swagger UI, open the **POST/api/clients** endpoint and pas
 ````markdown
 {
   "clientId": "<your-client-id>",   // replace with your own client identifier (e.g., "daaa")
-  "clientName": "<your-app-name>",   // replace with your application's display name         // human-friendly name; clearly distinct from clientId
+  "clientName": "<your-app-name>",   // replace with your application's display name    
   "secret": "secret",
   "redirectUris": [
     "https://localhost:7006/signin-oidc"   // replace 7006 with your app's base URL port (applicationUrl)
