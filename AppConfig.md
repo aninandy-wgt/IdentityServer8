@@ -33,7 +33,6 @@ In the IdentityServer Swagger UI, open the **POST/api/clients** endpoint and pas
 | Property | Description |
 | :------- | :---------- |
 | **clientId** | A unique identifier for your app—change to match your app’s name (e.g. `DemoApp`). |
-| **clientName** | A human-friendly display name for the consent screen (optional). |
 | **secret** | Shared secret for the code-flow back channel. Must match `options.ClientSecret` in your app. |
 | **redirectUris** | Where IdentityServer sends the OIDC response (the `/signin-oidc` endpoint in your app). |
 | **postLogoutRedirectUris** | Where to return the browser after sign-out completes (the `/signout-callback-oidc` endpoint). |
