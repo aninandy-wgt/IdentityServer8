@@ -17,10 +17,7 @@ In the IdentityServer Swagger UI, open the **POST/api/clients** endpoint and pas
   ],
   "postLogoutRedirectUris": [
     "https://localhost:7006/signout-callback-oidc"   // same port as above; matches your applicationUrl
-  ],
-  "postLogoutRedirectUris": [
-    "https://localhost:7006/signout-callback-oidc"
-  ],
+  ], 
   "scopes": [
     "openid",
     "profile",
