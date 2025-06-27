@@ -3,7 +3,6 @@
 
 Below is a detailed, step-by-step guide to registering a new client in IdentityServer and wiring it up in your DemoApp’s `Program.cs`.
 
----
 
 ## 1. Registering a New Client in IdentityServer
 
