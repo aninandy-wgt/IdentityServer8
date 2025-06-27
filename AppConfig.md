@@ -2,8 +2,6 @@
 # DemoApp IdentityServer Integration Guide
 
 Below is a detailed, step-by-step guide to registering a new client in IdentityServer and wiring it up in your DemoApp’s `Program.cs`.
-
-
 ## 1. Registering a New Client in IdentityServer
 
 In the IdentityServer Swagger UI, open the **POST/api/clients** endpoint and paste the following JSON payload to register your new application:
@@ -44,13 +42,8 @@ In the IdentityServer Swagger UI, open the **POST/api/clients** endpoint and pas
 * `offline_access` → allows issuance of a refresh token  |
 
 > **Note:** To persist a refresh-token grant record under `/grants`, include `"offline_access"` in scopes **and** set `AllowOfflineAccess = true` on the `Client` object.
-
 ---
-
 ## 2. Wiring Up the DemoApp (`Program.cs`)
-
-Below is a walkthrough of each section in your `Program.cs`:
-
 ```csharp
 using Duende.IdentityModel;
 using Microsoft.AspNetCore.Authentication;
