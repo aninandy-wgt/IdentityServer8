@@ -1,28 +1,21 @@
-````markdown
+
 # DemoApp IdentityServer Integration Guide
 
 Below is a detailed, step-by-step guide to registering a new client in IdentityServer and wiring it up in your DemoApp’s `Program.cs`.
-
----
-
 ## 1. Registering a New Client in IdentityServer
 
-In the IdentityServer Swagger UI, open the **Create Client** endpoint and paste the following JSON payload to register your new application:
-
-```json
+In the IdentityServer Swagger UI, open the **POST/api/clients** endpoint and paste the following JSON payload to register your new application:
+````json
 {
-  "clientId": "<your-client-id>",   // replace with your own client identifier (e.g., "daaa")
-  "clientName": "<your-app-name>",   // replace with your application's display name         // human-friendly name; clearly distinct from clientId
+  "clientId": "<your-client-id>",   // replace with own client id (ex. "daaa")
+  "clientName": null,       
   "secret": "secret",
   "redirectUris": [
-    "https://localhost:7006/signin-oidc"   // replace 7006 with your app's base URL port (applicationUrl)
+    "https://localhost:7006/signin-oidc"   // replace with app's base URL port (applicationUrl)
   ],
   "postLogoutRedirectUris": [
-    "https://localhost:7006/signout-callback-oidc"   // same port as above; matches your applicationUrl
-  ],
-  "postLogoutRedirectUris": [
-    "https://localhost:7006/signout-callback-oidc"
-  ],
+    "https://localhost:7006/signout-callback-oidc"   // same port as above
+  ], 
   "scopes": [
     "openid",
     "profile",
@@ -35,18 +28,13 @@ In the IdentityServer Swagger UI, open the **Create Client** endpoint and paste 
   ]
 }
 ````
-
 | Property | Description |
-| -------- | ----------- |
-|          |             |
-
-| **clientId**               | A unique identifier for your app—change to match your app’s name (e.g. `DemoApp`).            |
-| -------------------------- | --------------------------------------------------------------------------------------------- |
-| **clientName**             | A human-friendly display name for the consent screen (optional).                              |
-| **secret**                 | Shared secret for the code-flow back channel. Must match `options.ClientSecret` in your app.  |
-| **redirectUris**           | Where IdentityServer sends the OIDC response (the `/signin-oidc` endpoint in your app).       |
+| :------- | :---------- |
+| **clientId** | A unique identifier for your app—change to match your app’s name (e.g. `DemoApp`). |
+| **secret** | Shared secret for the code-flow back channel. Must match `options.ClientSecret` in your app. |
+| **redirectUris** | Where IdentityServer sends the OIDC response (the `/signin-oidc` endpoint in your app). |
 | **postLogoutRedirectUris** | Where to return the browser after sign-out completes (the `/signout-callback-oidc` endpoint). |
-| **scopes**                 | Which scopes (claims & APIs) the client may request:                                          |
+| **scopes** | Which scopes (claims & APIs) the client may request: |
 
 * `openid`, `profile` → standard OIDC claims
 * `roles`, `verification`, `color`, `permissions` → custom identity/scopes
@@ -54,13 +42,8 @@ In the IdentityServer Swagger UI, open the **Create Client** endpoint and paste 
 * `offline_access` → allows issuance of a refresh token  |
 
 > **Note:** To persist a refresh-token grant record under `/grants`, include `"offline_access"` in scopes **and** set `AllowOfflineAccess = true` on the `Client` object.
-
 ---
-
 ## 2. Wiring Up the DemoApp (`Program.cs`)
-
-Below is a walkthrough of each section in your `Program.cs`:
-
 ```csharp
 using Duende.IdentityModel;
 using Microsoft.AspNetCore.Authentication;
@@ -152,27 +135,4 @@ app.MapRazorPages().RequireAuthorization();
 app.MapStaticAssets();
 app.Run();
 ```
-
-### Key Points
-
-1. `** / **`
-
-   * Sets up OIDC code flow (`ResponseType = "code"`) and cookie session.
-
-2. **Scopes & Claims**
-
-   * Call `options.Scope.Add(...)` for every server-side scope.
-   * Use `MapJsonKey` / `MapUniqueJsonKey` to pull custom claims into your user principal.
-
-3. \`\`
-
-   * Adding this scope + `AddOpenIdConnectAccessTokenManagement()` enables silent token renewal and persists a grant entry under **/grants**.
-
-4. **Authorization Policies**
-
-   * Define `Admin` / `User` roles to secure pages or API calls.
-
-With this file in place—your IdentityServer client JSON registration and matching DemoApp configuration—your `daaa` client will be fully integrated, appear under `/grants`, and support sign-in, refresh tokens, and role-based authorization end to end.
-
-```
-```
+With this file in place— IdentityServer client JSON registration and matching DemoApp configuration—`daaa` client will be fully integrated, appear under `/grants`, and support sign-in, refresh tokens, and role-based authorization end to end.
