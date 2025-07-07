@@ -16,9 +16,7 @@ internal static class HostingExtensions
         var migrationsAssembly = typeof(HostingExtensions).Assembly.GetName().Name;
 
         builder.Services.AddDbContext<ConfigurationDbContext>(options => options.UseNpgsql(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly)));
-
         builder.Services.AddDbContext<PersistedGrantDbContext>(options => options.UseNpgsql(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly)));
-
         builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 
         builder.Services.AddIdentity<ApplicationUser, ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
@@ -34,16 +32,17 @@ internal static class HostingExtensions
             options.UserInteraction.ConsentUrl = "/Identity/Consent";
             options.UserInteraction.ErrorUrl = "/Identity/Account/Error";
             options.UserInteraction.DeviceVerificationUrl = "/Identity/Account/Device";
-        }).AddConfigurationStore(options =>
+        })
+        .AddConfigurationStore(options =>
         {
             options.ConfigureDbContext = b => b.UseNpgsql(connectionString, npgsql => npgsql.MigrationsAssembly(migrationsAssembly));
-        }).AddOperationalStore(options =>
+        })
+        .AddOperationalStore(options =>
         {
             options.ConfigureDbContext = b => b.UseNpgsql(connectionString, npgsql => npgsql.MigrationsAssembly(migrationsAssembly));
         }).AddAspNetIdentity<ApplicationUser>().AddProfileService<CustomProfileService>();
 
         builder.Services.AddAuthentication();
-
         builder.Services.AddAuthorizationBuilder().AddPolicy("AAA_Admin", p => p.RequireRole(AppRoles.Admin)).AddPolicy("AAA_Viewer", p => p.RequireRole(AppRoles.Viewer)).AddPolicy("AAA_ProjectManager", p => p.RequireRole(AppRoles.ProjectManager));
 
         builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, CustomUserClaimsPrincipalFactory>();
@@ -57,6 +56,9 @@ internal static class HostingExtensions
             options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ResetPassword");
             options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ConfirmEmail");
         });
+
+        builder.Services.AddControllers();
+
         return builder.Build();
     }
 
@@ -66,10 +68,15 @@ internal static class HostingExtensions
 
         if (app.Environment.IsDevelopment()) app.UseDeveloperExceptionPage();
 
+        app.UseHttpsRedirection();
         app.UseStaticFiles();
+
         app.UseRouting();
         app.UseIdentityServer();
+        app.UseAuthentication();
         app.UseAuthorization();
+
+        app.MapControllers();
         app.MapRazorPages().RequireAuthorization();
 
         return app;

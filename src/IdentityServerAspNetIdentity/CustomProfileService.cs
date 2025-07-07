@@ -10,21 +10,15 @@ public class CustomProfileService(UserManager<ApplicationUser> userManager, IUse
 {
     protected override async Task GetProfileDataAsync(ProfileDataRequestContext context, ApplicationUser user)
     {
-        var principal = await GetUserClaimsAsync(user);
-        var identity = (ClaimsIdentity)principal.Identity!;
+        var identity = (ClaimsIdentity)(await GetUserClaimsAsync(user)).Identity!;
 
         if (!string.IsNullOrEmpty(user.FavoriteColor)) identity.AddClaim(new Claim("favorite_color", user.FavoriteColor));
 
-        var roles = await userManager.GetRolesAsync(user);
-        foreach (var roleName in roles)
+        foreach (var roleName in (IList<string>?)await userManager.GetRolesAsync(user))
         {
             identity.AddClaim(new Claim(ClaimTypes.Role, roleName));
             var role = await roleManager.FindByNameAsync(roleName);
-            if (role != null)
-            {
-                var roleClaims = await roleManager.GetClaimsAsync(role);
-                foreach (var claim in roleClaims.Where(c => c.Type == "permission")) identity.AddClaim(claim);
-            }
+            if (role != null) foreach (var claim in (await roleManager.GetClaimsAsync(role)).Where(c => c.Type == "permission")) identity.AddClaim(claim);
         }
         context.AddRequestedClaims(identity.Claims);
     }

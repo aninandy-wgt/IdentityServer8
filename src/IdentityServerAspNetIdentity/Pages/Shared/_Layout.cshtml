@@ -2,6 +2,7 @@
 @using IdentityServerAspNetIdentity.Models
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,24 +16,28 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="~/">AAA</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    @if (SignInManager.IsSignedIn(User))
+                    @* Show Login when anonymous, Logout only off the login page *@
+                    @if (!HttpContextAccessor.HttpContext.Request.Path.StartsWithSegments("/Identity/Account/Login", StringComparison.OrdinalIgnoreCase))
                     {
-                        <li class="nav-item">
-                            <form method="post" asp-area="Identity" asp-page="/Account/Logout" class="d-inline">
-                                <button type="submit" class="nav-link btn btn-link text-decoration-none">Logout</button>
-                            </form>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
-                        </li>
+                        if (SignInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item">
+                                <form method="post" asp-area="Identity" asp-page="/Account/Logout" class="d-inline">
+                                    <button type="submit" class="nav-link btn btn-link text-decoration-none">Logout</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                            </li>
+                        }
                     }
                 </ul>
             </div>
@@ -40,7 +45,9 @@
     </nav>
 
     <div class="container mt-4">
-        @if (SignInManager.IsSignedIn(User))
+        @* Only show admin nav on non-login page *@
+        @if (SignInManager.IsSignedIn(User) &&
+                !HttpContextAccessor.HttpContext.Request.Path.StartsWithSegments("/Identity/Account/Login", StringComparison.OrdinalIgnoreCase))
         {
             <ul class="nav nav-pills mb-4">
                 <li class="nav-item">

@@ -5,8 +5,7 @@ namespace IdentityServerAspNetIdentity;
 
 public static class Config
 {
-    public static IEnumerable<IdentityResource> IdentityResources =>
-    [
+    public static IEnumerable<IdentityResource> IdentityResources => [
         new IdentityResources.OpenId(), new IdentityResources.Profile(),
         new IdentityResource(name: "verification", userClaims: [JwtClaimTypes.Email, JwtClaimTypes.EmailVerified]),
         new IdentityResource(name: "color", displayName: "Your favorite color", userClaims: ["favorite_color"]),
@@ -15,7 +14,7 @@ public static class Config
     ];
     public static IEnumerable<ApiScope> ApiScopes => [
         new ApiScope(name: "api1", displayName: "My API")
-        ];
+    ];
     public static IEnumerable<Client> Clients => [];
     public static IEnumerable<ApiResource> ApiResources { get; } = [];
 }

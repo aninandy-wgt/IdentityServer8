@@ -4,36 +4,20 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace IdentityServerAspNetIdentity.Areas.Identity.Pages.Account
+namespace IdentityServerAspNetIdentity.Areas.Identity.Pages.Account;
+
+[AllowAnonymous]
+public class LogoutModel(SignInManager<ApplicationUser> signInManager, ILogger<LogoutModel> logger) : PageModel
 {
-    [AllowAnonymous]
-    public class LogoutModel : PageModel
+    public void OnGet() { }
+
+    public async Task<IActionResult> OnPost(string returnUrl = null)
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly ILogger<LogoutModel> _logger;
+        await signInManager.SignOutAsync();
+        logger.LogInformation("User logged out.");
+        if (returnUrl != null) return LocalRedirect(returnUrl);
 
-        public LogoutModel(SignInManager<ApplicationUser> signInManager, ILogger<LogoutModel> logger)
-        {
-            _signInManager = signInManager;
-            _logger = logger;
-        }
-
-        public void OnGet()
-        {
-        }
-
-        public async Task<IActionResult> OnPost(string returnUrl = null)
-        {
-            await _signInManager.SignOutAsync();
-            _logger.LogInformation("User logged out.");
-            if (returnUrl != null)
-            {
-                return LocalRedirect(returnUrl);
-            }
-            else
-            {
-                return RedirectToPage();
-            }
-        }
+        else return RedirectToPage();
+        
     }
 }
